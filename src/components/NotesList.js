@@ -1,12 +1,13 @@
 import "./NotesList.css";
 
-function NotesList({ notes }) {
+function NotesList({ notes, onNoteClick }) {
   return (
     <div className="notes-container">
       {notes.length ? (
         notes.map((note, index) => (
-          <div key={index} className="note">
-            <p>{note}</p>
+          <div key={index} className="note" onClick={() => onNoteClick(note)}>
+            <h3>{note.title}</h3>
+            <p>{note.content}</p>
           </div>
         ))
       ) : (
