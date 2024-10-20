@@ -1,9 +1,9 @@
 import "./AddButton.css";
 
-function AddButton({ addNote }) {
+function AddButton({ onClick }) {
   return (
     <div className="bottom-bar">
-      <button className="add-btn" onClick={addNote}>
+      <button className="add-btn" onClick={onClick}>
         +
       </button>
     </div>

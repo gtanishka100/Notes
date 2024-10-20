@@ -1,0 +1,43 @@
+.add-note-container {
+    background-image: url('../../img/backdrop.jpg');
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #fff;
+  }
+  
+  .note-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .back-btn, .save-btn {
+    background-color: #ffcc00;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .note-input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .note-textarea {
+    width: 80%;
+    height: 200px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    resize:none;
+  }
+  
