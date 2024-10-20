@@ -1,0 +1,24 @@
+.bottom-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #3e2a19;
+    color: #ffc107;
+    padding: 10px;
+    text-align: right;
+  }
+  
+  .add-btn {
+    background-color: #ffc107; 
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #3e2a19;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  

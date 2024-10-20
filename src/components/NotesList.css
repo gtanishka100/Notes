@@ -1,0 +1,28 @@
+.notes-container {
+    display: flex;              
+    flex-direction: row;       
+    flex-wrap: wrap;           
+    gap: 10px;                
+    padding: 15px;             
+    width: 100%;       
+}
+
+.note {
+    background-color: #b89f87;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 15px;
+    border-radius: 10px;
+    color: black;
+    font-size: 16px;
+    width: 165px;  
+    height: 165px; 
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.no-notes {
+    color: #713f1e;
+}
