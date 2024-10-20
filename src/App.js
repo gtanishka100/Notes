@@ -1,3 +1,4 @@
+// App.js
 import "./App.css";
 import React, { useState } from "react";
 import Header from "./components/Header";
@@ -39,6 +40,11 @@ function App() {
     setIsEditing(false);
   };
 
+  const deleteNote = (index) => {
+    const updatedNotes = notes.filter((_, i) => i !== index);
+    setNotes(updatedNotes);
+  };
+
   const filteredNotes = notes.filter(
     (note) =>
       note.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -64,7 +70,11 @@ function App() {
         <>
           <Header />
           <SearchBar search={search} setSearch={setSearch} />
-          <NotesList notes={filteredNotes} onNoteClick={editNote} />
+          <NotesList
+            notes={filteredNotes}
+            onNoteClick={editNote}
+            onDeleteNote={deleteNote}
+          />
           <AddButton onClick={() => setIsAddingNote(true)} />
         </>
       )}

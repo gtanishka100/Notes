@@ -1,48 +1,60 @@
 .notes-container {
-    display: flex;              
-    flex-direction: row; 
-    gap: 10px;              
+    display: flex;
+    flex-direction: row;       
+    flex-wrap: wrap;           
+    gap: 10px;                
     padding: 15px;             
-    width: 100%;      
+    width: 100%;       
 }
 
 .note {
-    background-color: #b89f87; 
+    background-color: #b89f87;
     display: flex;
     flex-direction: column; 
     padding: 15px;
-    border-radius: 10px; 
+    border-radius: 10px;
     color: black;
     font-size: 16px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
-    cursor: pointer; 
-    transition: background-color 0.3s; 
-    overflow: hidden; 
-    white-space: normal; 
-    word-wrap: break-word; 
-    height: 165px;
-    width: 165px;
+    width: 165px;  
+    height: 165px; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    position: relative; 
 }
 
+.delete-button {
+    position: absolute; 
+    bottom: 10px; 
+    right: 10px; 
+        background-color: #d9534f; 
+        color: white; 
+        border: none; 
+        border-radius: 5px;
+        padding: 5px 10px; 
+        cursor: pointer; 
+        transition: background-color 0.3s; 
+      }
+      
+      .delete-button:hover {
+        background-color: #c9302c; 
+      }
+
 .no-notes {
-    color: #713f1e; 
+    color: #713f1e;
 }
 
 .note:hover {
-    background-color: #f0f0f0; 
+    background-color: #f0f0f0;
 }
 
 .note h3 {
     margin: 0; 
     font-size: 18px; 
-    margin-bottom: 8px;
-    white-space: normal; 
 }
 
 .note p {
-    margin: 0; 
     margin-top: 5px; 
-    font-size: 16px;
+    font-size: 16px; 
     color: #333; 
     white-space: pre-wrap; 
     word-wrap: break-word; 

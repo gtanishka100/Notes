@@ -1,6 +1,6 @@
 import "./NotesList.css";
 
-function NotesList({ notes, onNoteClick }) {
+function NotesList({ notes, onNoteClick, onDeleteNote }) {
   return (
     <div className="notes-container">
       {notes.length ? (
@@ -8,6 +8,15 @@ function NotesList({ notes, onNoteClick }) {
           <div key={index} className="note" onClick={() => onNoteClick(note)}>
             <h3>{note.title}</h3>
             <p>{note.content}</p>
+            <button
+              className="delete-button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDeleteNote(index);
+              }}
+            >
+              Delete
+            </button>
           </div>
         ))
       ) : (
