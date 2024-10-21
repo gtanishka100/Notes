@@ -1,109 +1,74 @@
-import "./App.css";
 import React, { useState } from "react";
-import Header from "./components/Header";
-import SearchBar from "./components/SearchBar";
-import NotesList from "./components/NotesList";
-import AddButton from "./components/AddButton";
-import AddNote from "./components/AddNote";
-import EditNote from "./components/EditNote";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import RegisterForm from "./Pages/RegisterForm";
+import LoginForm from "./Pages/LoginForm";
+import NotesPage from "./Pages/NotesPage";
 
 function App() {
-  const getInitialNotes = () => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [];
+  const getInitialLoginState = () => {
+    const savedLoginState = localStorage.getItem("loggedIn");
+    return savedLoginState ? JSON.parse(savedLoginState) : false;
   };
 
-  const [notes, setNotes] = useState(getInitialNotes);
-  const [newNote, setNewNote] = useState({ title: "", content: "" });
-  const [search, setSearch] = useState("");
-  const [isAddingNote, setIsAddingNote] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedNote, setSelectedNote] = useState(null);
-  const [sortCriterion, setSortCriterion] = useState("title");
+  const [loggedIn, setLoggedIn] = useState(getInitialLoginState);
 
-  const updateLocalStorage = (notes) => {
-    localStorage.setItem("notes", JSON.stringify(notes));
+  const handleLogin = () => {
+    setLoggedIn(true);
+    localStorage.setItem("loggedIn", true);
   };
 
-  const addNote = () => {
-    if (newNote.title.trim() !== "" && newNote.content.trim() !== "") {
-      const updatedNotes = [...notes, newNote];
-      setNotes(updatedNotes);
-      updateLocalStorage(updatedNotes);
-      setNewNote({ title: "", content: "" });
-      setIsAddingNote(false);
-    }
+  const handleRegister = () => {
+    setLoggedIn(true);
+    localStorage.setItem("loggedIn", true);
   };
 
-  const editNote = (note) => {
-    setSelectedNote(note);
-    setIsEditing(true);
-  };
-
-  const saveEditedNote = (updatedNote) => {
-    const updatedNotes = notes.map((note) =>
-      note === selectedNote ? updatedNote : note
+  const RegisterWithNavigate = () => {
+    const navigate = useNavigate();
+    return (
+      <RegisterForm
+        onRegister={handleRegister}
+        onToggleToLogin={() => navigate("/login")}
+      />
     );
-    setNotes(updatedNotes);
-    updateLocalStorage(updatedNotes);
-    setIsEditing(false);
   };
-
-  const deleteNote = (index) => {
-    const updatedNotes = notes.filter((_, i) => i !== index);
-    setNotes(updatedNotes);
-    updateLocalStorage(updatedNotes);
-  };
-
-  const filteredNotes = notes.filter(
-    (note) =>
-      note.title.toLowerCase().includes(search.toLowerCase()) ||
-      note.content.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const sortedNotes = [...filteredNotes].sort((a, b) => {
-    if (sortCriterion === "title") {
-      return a.title.localeCompare(b.title);
-    } else {
-      return new Date(b.date) - new Date(a.date);
-    }
-  });
 
   return (
-    <div className="app-container">
-      {isAddingNote ? (
-        <AddNote
-          newNote={newNote}
-          setNewNote={setNewNote}
-          addNote={addNote}
-          setIsAddingNote={setIsAddingNote}
-        />
-      ) : isEditing ? (
-        <EditNote
-          selectedNote={selectedNote}
-          onSave={saveEditedNote}
-          setIsEditing={setIsEditing}
-        />
-      ) : (
-        <>
-          <Header />
-          <SearchBar search={search} setSearch={setSearch} />
-          <select
-            onChange={(e) => setSortCriterion(e.target.value)}
-            value={sortCriterion}
-          >
-            <option value="title">Sort by Title</option>
-            <option value="date">Sort by Date</option>
-          </select>
-          <NotesList
-            notes={sortedNotes}
-            onNoteClick={editNote}
-            onDeleteNote={deleteNote}
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              loggedIn ? (
+                <Navigate to="/notes" replace />
+              ) : (
+                <RegisterWithNavigate />
+              )
+            }
           />
-          <AddButton onClick={() => setIsAddingNote(true)} />
-        </>
-      )}
-    </div>
+          <Route
+            path="/login"
+            element={
+              loggedIn ? (
+                <Navigate to="/notes" replace />
+              ) : (
+                <LoginForm onLogin={handleLogin} />
+              )
+            }
+          />
+          <Route
+            path="/notes"
+            element={loggedIn ? <NotesPage /> : <Navigate to="/" replace />}
+          />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
