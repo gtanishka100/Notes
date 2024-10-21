@@ -1,4 +1,3 @@
-// App.js
 import "./App.css";
 import React, { useState } from "react";
 import Header from "./components/Header";
@@ -9,19 +8,28 @@ import AddNote from "./components/AddNote";
 import EditNote from "./components/EditNote";
 
 function App() {
-  const [notes, setNotes] = useState([
-    { title: "Reminders", content: "Buy groceries" },
-    { title: "React", content: "Important topics" },
-  ]);
+  const getInitialNotes = () => {
+    const savedNotes = localStorage.getItem("notes");
+    return savedNotes ? JSON.parse(savedNotes) : [];
+  };
+
+  const [notes, setNotes] = useState(getInitialNotes);
   const [newNote, setNewNote] = useState({ title: "", content: "" });
   const [search, setSearch] = useState("");
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [sortCriterion, setSortCriterion] = useState("title");
+
+  const updateLocalStorage = (notes) => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  };
 
   const addNote = () => {
     if (newNote.title.trim() !== "" && newNote.content.trim() !== "") {
-      setNotes([...notes, newNote]);
+      const updatedNotes = [...notes, newNote];
+      setNotes(updatedNotes);
+      updateLocalStorage(updatedNotes);
       setNewNote({ title: "", content: "" });
       setIsAddingNote(false);
     }
@@ -37,12 +45,14 @@ function App() {
       note === selectedNote ? updatedNote : note
     );
     setNotes(updatedNotes);
+    updateLocalStorage(updatedNotes);
     setIsEditing(false);
   };
 
   const deleteNote = (index) => {
     const updatedNotes = notes.filter((_, i) => i !== index);
     setNotes(updatedNotes);
+    updateLocalStorage(updatedNotes);
   };
 
   const filteredNotes = notes.filter(
@@ -50,6 +60,14 @@ function App() {
       note.title.toLowerCase().includes(search.toLowerCase()) ||
       note.content.toLowerCase().includes(search.toLowerCase())
   );
+
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    if (sortCriterion === "title") {
+      return a.title.localeCompare(b.title);
+    } else {
+      return new Date(b.date) - new Date(a.date);
+    }
+  });
 
   return (
     <div className="app-container">
@@ -70,8 +88,15 @@ function App() {
         <>
           <Header />
           <SearchBar search={search} setSearch={setSearch} />
+          <select
+            onChange={(e) => setSortCriterion(e.target.value)}
+            value={sortCriterion}
+          >
+            <option value="title">Sort by Title</option>
+            <option value="date">Sort by Date</option>
+          </select>
           <NotesList
-            notes={filteredNotes}
+            notes={sortedNotes}
             onNoteClick={editNote}
             onDeleteNote={deleteNote}
           />

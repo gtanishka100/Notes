@@ -20,24 +20,25 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     position: relative; 
+    overflow: hidden; 
 }
 
 .delete-button {
     position: absolute; 
     bottom: 10px; 
     right: 10px; 
-        background-color: #d9534f; 
-        color: white; 
-        border: none; 
-        border-radius: 5px;
-        padding: 5px 10px; 
-        cursor: pointer; 
-        transition: background-color 0.3s; 
-      }
+    background-color: #d9534f; 
+    color: white; 
+    border: none; 
+    border-radius: 5px;
+    padding: 5px 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s; 
+}
       
-      .delete-button:hover {
-        background-color: #c9302c; 
-      }
+.delete-button:hover {
+    background-color: #c9302c; 
+}
 
 .no-notes {
     color: #713f1e;
@@ -50,12 +51,20 @@
 .note h3 {
     margin: 0; 
     font-size: 18px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
 }
 
 .note p {
     margin-top: 5px; 
     font-size: 16px; 
     color: #333; 
-    white-space: pre-wrap; 
-    word-wrap: break-word; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box; 
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; 
+    line-height: 1.2em; 
+    max-height: 3.6em; 
 }

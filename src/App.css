@@ -18,3 +18,24 @@ body {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   position: relative;
 }
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 16px;
+  margin: 10px; /* Space between the select and other elements */
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+select:focus {
+  outline: none;
+  border-color: #b89f87; /* Change border color on focus */
+}
+
+option {
+  padding: 10px; /* Space inside each option */
+}
