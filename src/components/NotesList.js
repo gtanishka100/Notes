@@ -12,7 +12,7 @@ function NotesList({ notes, onNoteClick, onDeleteNote }) {
               className="delete-button"
               onClick={(event) => {
                 event.stopPropagation();
-                onDeleteNote(index);
+                onDeleteNote(note._id);
               }}
             >
               Delete

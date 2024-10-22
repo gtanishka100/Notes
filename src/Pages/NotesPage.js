@@ -6,6 +6,8 @@ import NotesList from "../components/NotesList";
 import AddButton from "../components/AddButton";
 import AddNote from "../components/AddNote";
 import EditNote from "../components/EditNote";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function NotesPage() {
   const [notes, setNotes] = useState([]);
@@ -15,6 +17,7 @@ function NotesPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [sortCriterion, setSortCriterion] = useState("title");
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchNotes = async () => {
     const sessionId = localStorage.getItem("session-id");
@@ -43,14 +46,14 @@ function NotesPage() {
         setNotes([]);
       }
     } catch (error) {
-      console.error("Error fetching notes:", error);
+      toast.error("Failed to fetch notes: " + error.message);
       setNotes([]);
     }
   };
 
   useEffect(() => {
+    console.log("Fetching notes...");
     fetchNotes();
-    console.log(notes);
   }, []);
 
   const addNote = () => {
@@ -75,9 +78,41 @@ function NotesPage() {
     setIsEditing(false);
   };
 
-  const deleteNote = (index) => {
-    const updatedNotes = notes.filter((_, i) => i !== index);
-    setNotes(updatedNotes);
+  const deleteNote = async (noteId) => {
+    const sessionId = localStorage.getItem("session-id");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `https://notes-backend-ts.onrender.com/api/notes/${noteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionId}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete note");
+      }
+
+      setNotes(notes.filter((note) => note._id !== noteId));
+      toast.success("Note deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete note: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      await deleteNote(noteId);
+    }
   };
 
   const filteredNotes = notes?.filter(
@@ -96,6 +131,19 @@ function NotesPage() {
 
   return (
     <div className="app-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       {isAddingNote ? (
         <AddNote
           newNote={newNote}
@@ -123,9 +171,13 @@ function NotesPage() {
           <NotesList
             notes={sortedNotes}
             onNoteClick={editNote}
-            onDeleteNote={deleteNote}
+            onDeleteNote={handleDeleteNote}
+            isLoading={isLoading}
           />
-          <AddButton onClick={() => setIsAddingNote(true)} />
+          <AddButton
+            onClick={() => setIsAddingNote(true)}
+            disabled={isLoading}
+          />
         </>
       )}
     </div>
