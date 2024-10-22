@@ -52,30 +52,12 @@ function NotesPage() {
   };
 
   useEffect(() => {
-    console.log("Fetching notes...");
     fetchNotes();
   }, []);
-
-  const addNote = () => {
-    if (newNote.title.trim() !== "" && newNote.content.trim() !== "") {
-      const updatedNotes = [...notes, newNote];
-      setNotes(updatedNotes);
-      setNewNote({ title: "", content: "" });
-      setIsAddingNote(false);
-    }
-  };
 
   const editNote = (note) => {
     setSelectedNote(note);
     setIsEditing(true);
-  };
-
-  const saveEditedNote = (updatedNote) => {
-    const updatedNotes = notes.map((note) =>
-      note === selectedNote ? updatedNote : note
-    );
-    setNotes(updatedNotes);
-    setIsEditing(false);
   };
 
   const deleteNote = async (noteId) => {
@@ -129,6 +111,91 @@ function NotesPage() {
     }
   });
 
+  const addNote = async () => {
+    if (newNote.title.trim() === "" || newNote.content.trim() === "") {
+      toast.error("Title and content are required!");
+      return;
+    }
+
+    setIsLoading(true);
+    const sessionId = localStorage.getItem("session-id");
+
+    try {
+      const response = await fetch(
+        "https://notes-backend-ts.onrender.com/api/notes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionId}`,
+          },
+          body: JSON.stringify({
+            title: newNote.title,
+            content: newNote.content,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create note");
+      }
+
+      // Add the new note to the state
+      setNotes((prevNotes) => [...prevNotes, data.data.note]);
+      setNewNote({ title: "", content: "" });
+      setIsAddingNote(false);
+      toast.success("Note created successfully!");
+    } catch (error) {
+      toast.error("Failed to create note: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveEditedNote = async (updatedNote) => {
+    setIsLoading(true);
+    const sessionId = localStorage.getItem("session-id");
+
+    try {
+      const response = await fetch(
+        `https://notes-backend-ts.onrender.com/api/notes/${updatedNote._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionId}`,
+          },
+          body: JSON.stringify({
+            title: updatedNote.title,
+            content: updatedNote.content,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update note");
+      }
+
+      // Update the note in the local state
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note._id === updatedNote._id ? data.data.note : note
+        )
+      );
+
+      setIsEditing(false);
+      toast.success("Note updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update note: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="app-container">
       <ToastContainer
@@ -150,12 +217,14 @@ function NotesPage() {
           setNewNote={setNewNote}
           addNote={addNote}
           setIsAddingNote={setIsAddingNote}
+          isLoading={isLoading}
         />
       ) : isEditing ? (
         <EditNote
           selectedNote={selectedNote}
           onSave={saveEditedNote}
           setIsEditing={setIsEditing}
+          isLoading={isLoading}
         />
       ) : (
         <>

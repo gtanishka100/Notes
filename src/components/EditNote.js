@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import "./EditNote.css";
+import { toast } from "react-toastify";
 
-function EditNote({ selectedNote, onSave, setIsEditing }) {
+function EditNote({ selectedNote, onSave, setIsEditing, isLoading }) {
   const [modifiedTitle, setModifiedTitle] = useState(selectedNote.title);
   const [modifiedContent, setModifiedContent] = useState(selectedNote.content);
 
   const handleSave = () => {
-    if (modifiedTitle.trim() !== "" && modifiedContent.trim() !== "") {
-      onSave({ title: modifiedTitle, content: modifiedContent });
-      setIsEditing(false);
+    if (modifiedTitle.trim() === "" || modifiedContent.trim() === "") {
+      toast.error("Title and content are required!");
+      return;
     }
+    onSave({
+      title: modifiedTitle,
+      content: modifiedContent,
+      _id: selectedNote._id,
+    });
   };
 
   return (
@@ -22,16 +28,22 @@ function EditNote({ selectedNote, onSave, setIsEditing }) {
           value={modifiedTitle}
           onChange={(e) => setModifiedTitle(e.target.value)}
           className="edit-title-input"
+          disabled={isLoading}
         />
         <textarea
           placeholder="Write your note here..."
           value={modifiedContent}
           onChange={(e) => setModifiedContent(e.target.value)}
           className="edit-textarea"
+          disabled={isLoading}
         />
         <div className="button-group">
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-          <button onClick={handleSave}>Save</button>
+          <button onClick={() => setIsEditing(false)} disabled={isLoading}>
+            Cancel
+          </button>
+          <button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </button>
         </div>
       </div>
     </div>
