@@ -36,7 +36,6 @@ const RegisterForm = ({ onRegister, onToggleToLogin }) => {
         throw new Error(data.message || data.error || "Registration failed");
       }
       if (data.success && data.data.id) {
-        // Save user session ID in localStorage
         localStorage.setItem("User-id", data.data.id);
 
         setUserName("");
@@ -88,7 +87,7 @@ const RegisterForm = ({ onRegister, onToggleToLogin }) => {
       />
 
       <div className="image-container">
-        <img src={Image} alt="login img" />
+        <img src={Image} alt="register img" />
       </div>
       <form className="register-form" onSubmit={handleRegister}>
         <h2 className="register-form">Register a new account</h2>

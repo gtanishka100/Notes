@@ -9,6 +9,8 @@ import {
 import RegisterForm from "./Pages/RegisterForm";
 import LoginForm from "./Pages/LoginForm";
 import NotesPage from "./Pages/NotesPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const getInitialLoginState = () => {
@@ -18,14 +20,26 @@ function App() {
 
   const [loggedIn, setLoggedIn] = useState(getInitialLoginState);
 
-  const handleLogin = () => {
-    setLoggedIn(true);
-    localStorage.setItem("loggedIn", true);
+  const handleLogin = (data) => {
+    if (data.success && data.data?.sessionId) {
+      localStorage.setItem("session-id", data.data.sessionId);
+      localStorage.setItem("loggedIn", "true");
+      setLoggedIn(true);
+    }
   };
 
-  const handleRegister = () => {
-    setLoggedIn(true);
-    localStorage.setItem("loggedIn", true);
+  const handleRegister = (data) => {
+    if (data.success && data.data?.id) {
+      localStorage.setItem("session-id", data.data.id);
+      localStorage.setItem("loggedIn", "true");
+      setLoggedIn(true);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("session-id");
+    localStorage.removeItem("loggedIn");
+    setLoggedIn(false);
   };
 
   const RegisterWithNavigate = () => {
@@ -38,9 +52,42 @@ function App() {
     );
   };
 
+  const LoginWithNavigate = () => {
+    const navigate = useNavigate();
+    return (
+      <LoginForm
+        onLogin={handleLogin}
+        onToggleToRegister={() => navigate("/")}
+      />
+    );
+  };
+
+  const ProtectedRoute = ({ children }) => {
+    const sessionId = localStorage.getItem("session-id");
+
+    if (!loggedIn || !sessionId) {
+      return <Navigate to="/login" replace />;
+    }
+
+    return children;
+  };
+
   return (
     <Router>
       <div className="app-container">
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+
         <Routes>
           <Route
             path="/"
@@ -58,13 +105,17 @@ function App() {
               loggedIn ? (
                 <Navigate to="/notes" replace />
               ) : (
-                <LoginForm onLogin={handleLogin} />
+                <LoginWithNavigate />
               )
             }
           />
           <Route
             path="/notes"
-            element={loggedIn ? <NotesPage /> : <Navigate to="/" replace />}
+            element={
+              <ProtectedRoute>
+                <NotesPage onLogout={handleLogout} />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </div>
