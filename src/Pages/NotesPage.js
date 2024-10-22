@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from "react";
 import "./../App.css";
-import React, { useState } from "react";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import NotesList from "../components/NotesList";
@@ -8,12 +8,7 @@ import AddNote from "../components/AddNote";
 import EditNote from "../components/EditNote";
 
 function NotesPage() {
-  const getInitialNotes = () => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [];
-  };
-
-  const [notes, setNotes] = useState(getInitialNotes);
+  const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState({ title: "", content: "" });
   const [search, setSearch] = useState("");
   const [isAddingNote, setIsAddingNote] = useState(false);
@@ -21,15 +16,47 @@ function NotesPage() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [sortCriterion, setSortCriterion] = useState("title");
 
-  const updateLocalStorage = (notes) => {
-    localStorage.setItem("notes", JSON.stringify(notes));
+  const fetchNotes = async () => {
+    const sessionId = localStorage.getItem("session-id");
+
+    try {
+      const response = await fetch(
+        "https://notes-backend-ts.onrender.com/api/notes",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionId}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch notes");
+      }
+
+      if (data.success && data.data.notes) {
+        setNotes(data.data.notes);
+      } else {
+        setNotes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+      setNotes([]);
+    }
   };
+
+  useEffect(() => {
+    fetchNotes();
+    console.log(notes);
+  }, []);
 
   const addNote = () => {
     if (newNote.title.trim() !== "" && newNote.content.trim() !== "") {
       const updatedNotes = [...notes, newNote];
       setNotes(updatedNotes);
-      updateLocalStorage(updatedNotes);
       setNewNote({ title: "", content: "" });
       setIsAddingNote(false);
     }
@@ -45,17 +72,15 @@ function NotesPage() {
       note === selectedNote ? updatedNote : note
     );
     setNotes(updatedNotes);
-    updateLocalStorage(updatedNotes);
     setIsEditing(false);
   };
 
   const deleteNote = (index) => {
     const updatedNotes = notes.filter((_, i) => i !== index);
     setNotes(updatedNotes);
-    updateLocalStorage(updatedNotes);
   };
 
-  const filteredNotes = notes.filter(
+  const filteredNotes = notes?.filter(
     (note) =>
       note.title.toLowerCase().includes(search.toLowerCase()) ||
       note.content.toLowerCase().includes(search.toLowerCase())
